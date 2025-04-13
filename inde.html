@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Currency - Zerux Brawl</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        select, input, button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Zerux Brawl - Add Currency</h1>
+    <form id="currencyForm">
+        <label for="currencyType">Select Currency:</label>
+        <select id="currencyType" name="currencyType" required>
+            <option value="gems">Gems</option>
+            <option value="gold">Gold</option>
+            <option value="starpoints">Star Points</option>
+        </select>
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" required placeholder="e.g., 100 or -50">
+
+        <label for="playerId">Player ID:</label>
+        <input type="text" id="playerId" name="playerId" required placeholder="e.g., 2">
+
+        <button type="submit">Add</button>
+    </form>
+    <p id="message"></p>
+    <script>
+        // Handle form submission
+        document.getElementById('currencyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currencyType = document.getElementById('currencyType').value;
+            const amount = parseInt(document.getElementById('amount').value);
+            const playerId = document.getElementById('playerId').value;
+            const messageEl = document.getElementById('message');
+
+            try {
+                const response = await fetch('http://217.160.125.125:9375/api/add-currency', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer your-secret-api-key-12345' // Replace with secure API key
+                    },
+                    body: JSON.stringify({ currencyType, amount, playerId })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    messageEl.style.color = 'green';
+                    messageEl.textContent = `Success: Added ${amount} ${currencyType} to player ${playerId}!`;
+                } else {
+                    messageEl.style.color = 'red';
+                    messageEl.textContent = `Error: ${result.error || 'Failed to process request.'}`;
+                }
+            } catch (err) {
+                messageEl.style.color = 'red';
+                messageEl.textContent = 'Network error. Please try again later.';
+            }
+        });
+
+        // Auto-fill player ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('playerId').value = urlParams.get('playerId') || '';
+    </script>
+</body>
+</html>
